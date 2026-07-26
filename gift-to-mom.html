@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F&oslash;dselsdagsgave til Mor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg: #121212;
+      --box: #09090b;
+      --box-soft: #19191e;
+      --box-edge: #2c2c34;
+      --purple: #3b124b;
+      --purple-light: #7b2aa2;
+      --gold: #d9b45f;
+      --white: #fffaf0;
+      --card: #f7f0e5;
+      --ink: #161616;
+      --muted: #49413a;
+      --shadow: rgba(0, 0, 0, 0.46);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(217, 180, 95, 0.08), transparent 28%),
+        radial-gradient(circle at 18% 14%, rgba(123, 42, 162, 0.16), transparent 28%),
+        radial-gradient(circle at 86% 18%, rgba(217, 180, 95, 0.12), transparent 24%),
+        linear-gradient(145deg, #090909, var(--bg) 58%, #1a171d);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(circle at center, black, transparent 72%);
+    }
+
+    main {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 30px 16px;
+    }
+
+    .stage {
+      width: min(100%, 1000px);
+      min-height: min(720px, calc(100vh - 60px));
+      display: grid;
+      place-items: center;
+      position: relative;
+      text-align: center;
+    }
+
+    .intro {
+      display: grid;
+      justify-items: center;
+      gap: 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .gift-wrap {
+      width: clamp(220px, 42vw, 360px);
+      height: clamp(220px, 42vw, 360px);
+      position: relative;
+      display: grid;
+      place-items: end center;
+      perspective: 900px;
+      filter: drop-shadow(0 34px 34px var(--shadow));
+    }
+
+    .gift-glow {
+      position: absolute;
+      left: 50%;
+      bottom: 34%;
+      width: 58%;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      translate: -50% 0;
+      background:
+        radial-gradient(circle, rgba(255, 246, 195, 0.96), rgba(217, 180, 95, 0.42) 34%, rgba(123, 42, 162, 0.2) 56%, transparent 72%);
+      opacity: 0;
+      transform: scale(0.35);
+      filter: blur(4px);
+      z-index: 0;
+    }
+
+    .box-base {
+      width: 78%;
+      height: 56%;
+      position: relative;
+      border-radius: 12px 12px 20px 20px;
+      background:
+        linear-gradient(145deg, #25252d, var(--box) 42%, #050506),
+        var(--box);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        inset 0 22px 36px rgba(255, 255, 255, 0.055),
+        inset 0 -24px 30px rgba(0, 0, 0, 0.58),
+        0 28px 38px rgba(0, 0, 0, 0.46);
+      transform-origin: center center;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .box-base::before {
+      content: "";
+      position: absolute;
+      inset: 9% 7% auto;
+      height: 16%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+      opacity: 0.55;
+    }
+
+    .box-lid {
+      position: absolute;
+      width: 86%;
+      height: 23%;
+      bottom: 54%;
+      left: 50%;
+      translate: -50% 0;
+      border-radius: 16px 16px 11px 11px;
+      background:
+        linear-gradient(145deg, #303039, #09090b 58%, #030304),
+        var(--box);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow:
+        inset 0 14px 22px rgba(255, 255, 255, 0.07),
+        0 14px 18px rgba(0, 0, 0, 0.34);
+      transform-origin: 18% 100%;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .ribbon {
+      position: absolute;
+      z-index: 8;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.22), transparent 18%),
+        linear-gradient(135deg, var(--purple-light), var(--purple) 58%, #21082d);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 8px 18px rgba(0, 0, 0, 0.26);
+    }
+
+    .ribbon-vertical {
+      width: 13%;
+      height: 75%;
+      left: 50%;
+      bottom: 0;
+      translate: -50% 0;
+    }
+
+    .ribbon-horizontal-left,
+    .ribbon-horizontal-right {
+      width: 42%;
+      height: 11%;
+      bottom: 27%;
+    }
+
+    .ribbon-horizontal-left {
+      right: 50%;
+      border-radius: 999px 0 0 999px;
+    }
+
+    .ribbon-horizontal-right {
+      left: 50%;
+      border-radius: 0 999px 999px 0;
+    }
+
+    .ribbon-lid {
+      width: 13%;
+      height: 23%;
+      left: 50%;
+      bottom: 54%;
+      translate: -50% 0;
+      z-index: 9;
+    }
+
+    .cut-flash {
+      position: absolute;
+      left: 50%;
+      bottom: 27%;
+      width: 4px;
+      height: 54%;
+      translate: -50% 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, transparent, #ffffff, var(--gold), transparent);
+      box-shadow: 0 0 26px rgba(255, 255, 255, 0.9), 0 0 48px rgba(217, 180, 95, 0.55);
+      opacity: 0;
+      z-index: 12;
+    }
+
+    .open-button {
+      border: 0;
+      border-radius: 999px;
+      min-height: 56px;
+      padding: 15px 28px;
+      font-size: clamp(1rem, 2.4vw, 1.15rem);
+      font-weight: 850;
+      color: #17120a;
+      background: linear-gradient(135deg, #fff0ba, #d8b25a 56%, #f6d578);
+      box-shadow:
+        0 18px 32px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.66);
+      cursor: pointer;
+      transform-origin: center;
+    }
+
+    .open-button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-2px);
+    }
+
+    .gift-card {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      align-items: center;
+      gap: clamp(24px, 4vw, 52px);
+      width: min(100%, 980px);
+      padding: clamp(18px, 4vw, 42px);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 22% 20%, rgba(217, 180, 95, 0.24), transparent 32%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(247, 240, 229, 0.99));
+      color: var(--ink);
+      box-shadow:
+        0 38px 95px rgba(0, 0, 0, 0.46),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.76);
+      opacity: 0;
+      transform: translateY(26px) scale(0.96);
+      pointer-events: none;
+      position: absolute;
+      z-index: 1;
+    }
+
+    .gift-card.visible {
+      pointer-events: auto;
+      z-index: 4;
+    }
+
+    .product-frame {
+      display: block;
+      padding: clamp(12px, 2vw, 18px);
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, #ffffff, #e7dfd3),
+        #ffffff;
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.2),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+
+    .product-image {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      border-radius: 18px;
+      background: #ffffff;
+    }
+
+    .message {
+      text-align: left;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+      color: #171717;
+    }
+
+    p {
+      margin: 0;
+      font-size: clamp(1rem, 2.1vw, 1.22rem);
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .sender {
+      margin-top: 22px;
+      font-weight: 850;
+      color: #1f1c18;
+    }
+
+    .product-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 28px;
+      min-height: 52px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      background: #171717;
+      color: #fff8ea;
+      text-decoration: none;
+      font-weight: 850;
+      box-shadow: 0 14px 26px rgba(0, 0, 0, 0.22);
+    }
+
+    .product-link:hover {
+      transform: translateY(-2px);
+      background: #2a2a2a;
+    }
+
+    @media (max-width: 760px) {
+      main {
+        padding: 22px 14px;
+      }
+
+      .stage {
+        min-height: calc(100vh - 44px);
+      }
+
+      .gift-card {
+        grid-template-columns: 1fr;
+        border-radius: 22px;
+      }
+
+      .message {
+        text-align: center;
+      }
+
+      .product-link {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="stage" aria-label="Digital f&oslash;dselsdagsgave">
+      <div class="intro" id="intro">
+        <div class="gift-wrap" id="giftWrap" aria-hidden="true">
+          <div class="gift-glow" id="giftGlow"></div>
+          <div class="cut-flash" id="cutFlash"></div>
+          <div class="box-lid" id="boxLid"></div>
+          <div class="box-base" id="boxBase"></div>
+          <div class="ribbon ribbon-vertical" id="ribbonVertical"></div>
+          <div class="ribbon ribbon-horizontal-left" id="ribbonLeft"></div>
+          <div class="ribbon ribbon-horizontal-right" id="ribbonRight"></div>
+          <div class="ribbon ribbon-lid" id="ribbonLid"></div>
+        </div>
+
+        <button class="open-button" id="openGift" type="button">
+          Pak gaven ud &#127873;
+        </button>
+      </div>
+
+      <article class="gift-card" id="giftCard" aria-live="polite" tabindex="-1">
+        <a
+          class="product-frame"
+          href="https://www.eventyrsport.dk/produkt/transporter-toiletry-kit-large-toilettaske-0882601386/raven-black-black-645"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="&Aring;bn produktet hos Eventyrsport"
+        >
+          <img
+            class="product-image"
+            src="wc-taske.webp"
+            alt="Osprey Transporter Toiletry Kit Large i Raven Black"
+          />
+        </a>
+
+        <div class="message">
+          <h1>Stort tillykke med f&oslash;dselsdagen, Mor! &#127465;&#127472;</h1>
+          <p>
+            Vi h&aring;ber, du f&aring;r den dejligste dag med masser af hygge, k&aelig;rlighed og alt det,
+            der g&oslash;r dig glad. Din gave er en Osprey Transporter Toiletry Kit Large
+            toilettaske i farven Raven Black, s&aring; du kan have styr p&aring; det hele, uanset om
+            turen g&aring;r ud i verden eller bare v&aelig;k for en weekend.
+          </p>
+          <p class="sender">K&aelig;rlig hilsen S&oslash;ren &amp; Laurits</p>
+          <a
+            class="product-link"
+            href="https://www.eventyrsport.dk/produkt/transporter-toiletry-kit-large-toilettaske-0882601386/raven-black-black-645"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Se gaven hos Eventyrsport
+          </a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const openButton = document.getElementById("openGift");
+    const intro = document.getElementById("intro");
+    const giftWrap = document.getElementById("giftWrap");
+    const giftCard = document.getElementById("giftCard");
+    const giftGlow = document.getElementById("giftGlow");
+    const cutFlash = document.getElementById("cutFlash");
+    const boxLid = document.getElementById("boxLid");
+    const boxBase = document.getElementById("boxBase");
+    const ribbonVertical = document.getElementById("ribbonVertical");
+    const ribbonLeft = document.getElementById("ribbonLeft");
+    const ribbonRight = document.getElementById("ribbonRight");
+    const ribbonLid = document.getElementById("ribbonLid");
+
+    function burstConfetti() {
+      const colors = ["#d9b45f", "#fffaf0", "#3b124b", "#7b2aa2"];
+
+      confetti({
+        particleCount: 210,
+        spread: 86,
+        startVelocity: 54,
+        scalar: 1.05,
+        ticks: 210,
+        origin: { x: 0.5, y: 0.42 },
+        colors
+      });
+
+      confetti({
+        particleCount: 130,
+        angle: 60,
+        spread: 62,
+        startVelocity: 46,
+        origin: { x: 0, y: 0.62 },
+        colors
+      });
+
+      confetti({
+        particleCount: 130,
+        angle: 120,
+        spread: 62,
+        startVelocity: 46,
+        origin: { x: 1, y: 0.62 },
+        colors
+      });
+    }
+
+    openButton.addEventListener("click", () => {
+      openButton.disabled = true;
+
+      const timeline = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        onComplete: () => {
+          giftCard.classList.add("visible");
+          gsap.to(giftCard, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.72,
+            ease: "power3.out",
+            onComplete: () => giftCard.focus()
+          });
+        }
+      });
+
+      timeline
+        .to(openButton, {
+          scale: 0,
+          opacity: 0,
+          duration: 0.18,
+          ease: "back.in(2.8)"
+        })
+        .to(cutFlash, {
+          opacity: 1,
+          scaleY: 1.28,
+          duration: 0.11,
+          ease: "power4.out"
+        }, "-=0.02")
+        .to(cutFlash, {
+          opacity: 0,
+          duration: 0.12
+        })
+        .to(ribbonLeft, {
+          xPercent: -165,
+          y: -18,
+          rotation: -16,
+          opacity: 0,
+          duration: 0.38
+        }, "-=0.09")
+        .to(ribbonRight, {
+          xPercent: 165,
+          y: -18,
+          rotation: 16,
+          opacity: 0,
+          duration: 0.38
+        }, "<")
+        .to(ribbonVertical, {
+          yPercent: 92,
+          scaleY: 0.18,
+          opacity: 0,
+          duration: 0.28
+        }, "<")
+        .to(ribbonLid, {
+          y: -42,
+          scaleY: 0.2,
+          opacity: 0,
+          duration: 0.28
+        }, "<")
+        .to(boxLid, {
+          y: -42,
+          rotation: -9,
+          duration: 0.22,
+          ease: "power2.out"
+        }, "-=0.05")
+        .add(() => {
+          burstConfetti();
+        })
+        .to(giftGlow, {
+          opacity: 1,
+          scale: 1.28,
+          duration: 0.24,
+          ease: "power2.out"
+        }, "<")
+        .to(boxLid, {
+          x: -260,
+          y: -520,
+          rotation: -38,
+          scale: 1.08,
+          opacity: 0,
+          duration: 0.66,
+          ease: "power4.in"
+        }, "<")
+        .to(giftGlow, {
+          scale: 1.75,
+          opacity: 0.92,
+          duration: 0.36
+        }, "-=0.38")
+        .to([boxBase, giftGlow], {
+          scale: 3.25,
+          opacity: 0,
+          duration: 0.38,
+          ease: "power4.in"
+        }, "-=0.06")
+        .to(giftWrap, {
+          opacity: 0,
+          duration: 0.08
+        }, "<")
+        .set(intro, {
+          display: "none"
+        });
+    });
+  </script>
+</body>
+</html>
